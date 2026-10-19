@@ -1,0 +1,18 @@
+{
+  "name": "codex-advisor-kit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DSH 主执行 + Codex 只读顾问：让 DSH 调 Codex 出计划与审核，执行仍归 DSH",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.19"
+  },
+  "bin": {
+    "codex-advisor": "src/advisor.mjs"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/advisor.mjs && node --check src/app-server.mjs && node --check src/desktop.mjs && node --check src/prompts.mjs && node --check src/ledger.mjs && node --check src/context.mjs && node --check mcp/server.mjs"
+  }
+}
