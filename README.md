@@ -84,6 +84,10 @@ Copy-Item -Recurse -Force .\skills\dsh-codeadvisor `
 
 不想装技能也行：直接用下面的 CLI 命令，效果一样，只是 DSH 不会自己判断"该不该问 codex"。
 
+### 或者：让 AI 帮你装
+
+把 [AGENT-INSTALL.md](AGENT-INSTALL.md) 里第一节那段话**整段粘给你的 AI**，它会自己克隆仓库、把技能复制到 `$env:DSH_HOME\agents-home\skills\dsh-codeadvisor`、跑三项自检，并把路径与输出回报给你。人类不用手敲上面的命令。
+
 ## 用法
 
 ```powershell
