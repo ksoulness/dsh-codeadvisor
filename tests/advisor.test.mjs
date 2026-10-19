@@ -459,3 +459,23 @@ test('项目分页可找到目录；最终列表必须回读同一 projectId', a
   assert.equal(wrong.error.code, 'SIDEBAR_NOT_VISIBLE')
   assert.equal(wrong.sidebar.visibleInProject, false)
 })
+
+test('CLI --version 跟随 package.json，无子命令也能命中', async () => {
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'))
+  const run = (args) => new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [path.join(ROOT, 'src', 'advisor.mjs'), ...args], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+    })
+    let out = ''
+    child.stdout.setEncoding('utf8')
+    child.stdout.on('data', (d) => { out += d })
+    child.on('error', reject)
+    child.on('close', (code) => resolve({ code, out }))
+  })
+
+  const version = await run(['--version'])
+  assert.equal(version.out.trim(), `codex-advisor ${pkg.version}`)
+
+  const help = await run(['--help'])
+  assert.match(help.out, /codex-advisor — DSH 主执行/)
+})

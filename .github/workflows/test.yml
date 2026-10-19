@@ -1,0 +1,29 @@
+name: test
+
+# 只跑 Windows：README 明确写了非 Windows 未验证，先不制造一条永远红的流水线。
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  node:
+    name: node ${{ matrix.node }} on windows
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: syntax check
+        run: npm run check
+
+      - name: tests
+        run: npm test

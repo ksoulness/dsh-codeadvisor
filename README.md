@@ -1,5 +1,7 @@
 # Codex Advisor Kit
 
+[![test](https://github.com/ksoulness/codex-advisor-kit/actions/workflows/test.yml/badge.svg)](https://github.com/ksoulness/codex-advisor-kit/actions/workflows/test.yml)
+
 > **DSH 干活，Codex 出主意：一次问询、只读沙箱、结构化结果、台账可续——改动权始终在 DSH 手里。**
 
 [`ksoulness/dsh-codex-kit`](https://github.com/ksoulness/dsh-codex-kit) 把「Codex 想清楚、DSH 动手做」接成闭环。本项目是它的**反向**：DSH 是主控与执行方，Codex 降级为只读顾问——由 DSH 主动去 Codex 开新对话，让指定模型做计划与审核，然后由 DSH 自己执行和验收。
@@ -51,6 +53,8 @@ node --test
 ```
 
 零运行时依赖，不需要 `npm install`。
+
+> 本包**不发布到 npm**（`package.json` 保留 `"private": true` 以防误发布）；分发走 GitHub 仓库和 Release 里的 `codex-advisor-kit-0.1.0.tgz`。要改成可发布，删掉 `private` 字段再 `npm publish` 即可。
 
 把技能装上（DSH 新会话生效）：
 

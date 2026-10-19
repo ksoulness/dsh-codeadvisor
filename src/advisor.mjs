@@ -22,6 +22,16 @@ function badArg(message) {
   return { ok: false, error: { code: 'BAD_ARGS', message } }
 }
 
+/** 版本以 package.json 为唯一来源，避免 --version 与实际包版本漂移。 */
+const VERSION = (() => {
+  try {
+    const pkg = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'package.json')
+    return JSON.parse(fs.readFileSync(pkg, 'utf8')).version || '0.0.0'
+  } catch {
+    return '0.0.0'
+  }
+})()
+
 function isDir(p) {
   try {
     return fs.statSync(p).isDirectory()
@@ -542,12 +552,13 @@ async function main(argv) {
   const args = parseArgv(argv)
   const command = args._[0]
 
-  if (!command || command === 'help' || args.help) {
-    process.stdout.write(USAGE)
+  // 先判 version：`--version` 没有子命令，不能落进下面的 USAGE 分支。
+  if (command === 'version' || args.version) {
+    process.stdout.write(`codex-advisor ${VERSION}\n`)
     return 0
   }
-  if (command === 'version' || args.version) {
-    process.stdout.write('codex-advisor 0.1.0\n')
+  if (!command || command === 'help' || args.help) {
+    process.stdout.write(USAGE)
     return 0
   }
   if (command === 'sessions') return sessionsCommand(args)
