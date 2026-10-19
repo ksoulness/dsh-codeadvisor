@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * codex-advisor — DSH 主执行，Codex 只读顾问。
+ * dsh-codeadvisor — DSH 主执行，Codex 只读顾问。
  *
  * 三个动作：plan（出计划）、review（做审核）、ask（咨询）。
  * 每次都开一个全新的 Codex 线程；多轮延续走本地台账回放，不依赖 resume。
@@ -431,7 +431,7 @@ export async function runAdvisor(input = {}) {
   }
 }
 
-const USAGE = `codex-advisor — DSH 主执行，Codex 只读顾问
+const USAGE = `dsh-codeadvisor — DSH 主执行，Codex 只读顾问
 
 用法：
   node src/advisor.mjs plan   --task "<任务>" [选项]      出实施计划
@@ -584,7 +584,7 @@ async function main(argv) {
 
   // 先判 version：`--version` 没有子命令，不能落进下面的 USAGE 分支。
   if (command === 'version' || args.version) {
-    process.stdout.write(`codex-advisor ${VERSION}\n`)
+    process.stdout.write(`dsh-codeadvisor ${VERSION}\n`)
     return 0
   }
   if (!command || command === 'help' || args.help) {
@@ -655,7 +655,7 @@ if (invokedDirectly) {
   main(process.argv.slice(2)).then(
     (code) => process.exit(code),
     (err) => {
-      process.stderr.write(`codex-advisor 崩溃：${err?.stack || err}\n`)
+      process.stderr.write(`dsh-codeadvisor 崩溃：${err?.stack || err}\n`)
       process.exit(2)
     },
   )

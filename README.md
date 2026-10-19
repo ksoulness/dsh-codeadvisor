@@ -1,12 +1,31 @@
-# Codex Advisor Kit
+# DSH Code Advisor（dsh-codeadvisor）
 
-[![test](https://github.com/ksoulness/codex-advisor-kit/actions/workflows/test.yml/badge.svg)](https://github.com/ksoulness/codex-advisor-kit/actions/workflows/test.yml)
+**这是一个 DSH 技能 + CLI，不是插件。** 装在 DSH 里的是 `skills/dsh-codeadvisor/SKILL.md`（技能），跑起来的是 `node src/advisor.mjs`（CLI）——不是 DSH 插件、不是 Codex 插件、也不是 npm 包。
+
+[![test](https://github.com/ksoulness/dsh-codeadvisor/actions/workflows/test.yml/badge.svg)](https://github.com/ksoulness/dsh-codeadvisor/actions/workflows/test.yml)
 
 > **DSH 干活，Codex 出主意：一次问询、只读沙箱、结构化结果、台账可续——改动权始终在 DSH 手里。**
 
 [`ksoulness/dsh-codex-kit`](https://github.com/ksoulness/dsh-codex-kit) 把「Codex 想清楚、DSH 动手做」接成闭环。本项目是它的**反向**：DSH 是主控与执行方，Codex 降级为只读顾问——由 DSH 主动去 Codex 开新对话，让指定模型做计划与审核，然后由 DSH 自己执行和验收。
 
 不复制粘贴源码，不把 diff 塞进聊天框，也不把执行权交出去。
+
+## 这是什么：给 DSH 用的技能 + CLI
+
+这是 **[DeepSeek Harness（DSH）](https://github.com/deepseek-ai/deepseek-harness) 的配套工具**，离开 DSH 没有意义：DSH 是主控与执行方，它调用本仓库的 CLI 去 Codex 开一条只读线程，取回计划或审核意见，再由 DSH 自己改、自己验。
+
+| 组成 | 位置 | 说明 |
+| --- | --- | --- |
+| **DSH 技能**（主体） | `skills/dsh-codeadvisor/SKILL.md` | 告诉 DSH 什么时候该问、怎么挑模型、怎么验收。装进 `$DSH_HOME\agents-home\skills\` 后，新会话在技能目录里可见 |
+| CLI | `src/*.mjs` | 真正建线程、注入上下文、收正文与用量。不装技能也能直接命令行使用 |
+| 可选 MCP 壳 | `mcp/server.mjs` | 把同一套核心包成 `codex_plan` / `codex_review` / `codex_ask` 三个 MCP 工具，默认不启用 |
+
+**它不是什么**
+
+- **不是 DSH 插件**：没有 `dsh-plugin.naming.json`，不进 profile、不挂 Web 前端、不需要重装宿主。
+- **不是 Codex 插件**：不改 Codex 安装目录，只通过 `codex app-server` 的公开协议开线程。
+- **不是 npm 包**：`package.json` 保留 `private: true`，分发走本仓库与 Release tarball。
+- **不是「让 Codex 帮你改代码」**：线程恒定 `sandbox: read-only` + `approvalPolicy: never`，改动永远由 DSH 执行和验收。
 
 ## 解决什么问题
 
@@ -47,21 +66,23 @@ DSH  ❯ 自己动手改、自己跑测试、自己验证
 前置：Node.js ≥ 22.19、本机已登录的 `codex` CLI，支持 `app-server` 与 `historyMode: paginated`（本机桌面运行时 0.163.0-alpha.10.2 已验证；npm CLI 0.147.0 缺少项目协议，不可用于本目标）。
 
 ```powershell
-git clone https://github.com/ksoulness/codex-advisor-kit.git
-cd codex-advisor-kit
+git clone https://github.com/ksoulness/dsh-codeadvisor.git
+cd dsh-codeadvisor
 node --test
 ```
 
 零运行时依赖，不需要 `npm install`。
 
-> 本包**不发布到 npm**（`package.json` 保留 `"private": true` 以防误发布）；分发走 GitHub 仓库和 Release 里的 `codex-advisor-kit-0.1.0.tgz`。要改成可发布，删掉 `private` 字段再 `npm publish` 即可。
+> 本包**不发布到 npm**（`package.json` 保留 `"private": true` 以防误发布）；分发走 GitHub 仓库和 Release 里的 `dsh-codeadvisor-0.1.3.tgz`。要改成可发布，删掉 `private` 字段再 `npm publish` 即可。
 
-把技能装上（DSH 新会话生效）：
+把**技能**装上（DSH 新会话生效）。这一步只是给 DSH 加一个技能目录，不涉及插件安装、不改 profile、不需重启宿主：
 
 ```powershell
-Copy-Item -Recurse -Force .\skills\codex-advisor `
-  "$env:DSH_HOME\agents-home\skills\codex-advisor"
+Copy-Item -Recurse -Force .\skills\dsh-codeadvisor `
+  "$env:DSH_HOME\agents-home\skills\dsh-codeadvisor"
 ```
+
+不想装技能也行：直接用下面的 CLI 命令，效果一样，只是 DSH 不会自己判断"该不该问 codex"。
 
 ## 用法
 
@@ -214,7 +235,7 @@ src/prompts.mjs       角色契约、模型预设、三类任务的输出要求
 src/context.mjs       上下文注入（realpath 边界、预算、跳过原因）
 src/ledger.mjs        台账读写（sessions.jsonl + texts/）
 mcp/server.mjs        可选 stdio MCP 包装（codex_plan / codex_review / codex_ask）
-skills/codex-advisor/ 给 DSH 的技能：什么时候问、怎么问、怎么验收
+skills/dsh-codeadvisor/ 给 DSH 的技能：什么时候问、怎么问、怎么验收
 tests/                假 app-server 替身 + 23 项测试
 ```
 

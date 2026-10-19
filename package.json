@@ -1,17 +1,17 @@
 {
-  "name": "codex-advisor-kit",
-  "version": "0.1.2",
+  "name": "dsh-codeadvisor",
+  "version": "0.1.3",
   "private": true,
   "description": "DSH 主执行 + Codex 只读顾问：让 DSH 调 Codex 出计划与审核，执行仍归 DSH",
   "type": "module",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ksoulness/codex-advisor-kit.git"
+    "url": "git+https://github.com/ksoulness/dsh-codeadvisor.git"
   },
-  "homepage": "https://github.com/ksoulness/codex-advisor-kit#readme",
+  "homepage": "https://github.com/ksoulness/dsh-codeadvisor#readme",
   "bugs": {
-    "url": "https://github.com/ksoulness/codex-advisor-kit/issues"
+    "url": "https://github.com/ksoulness/dsh-codeadvisor/issues"
   },
   "keywords": [
     "dsh",
@@ -31,7 +31,7 @@
     "node": ">=22.19"
   },
   "bin": {
-    "codex-advisor": "src/advisor.mjs"
+    "dsh-codeadvisor": "src/advisor.mjs"
   },
   "scripts": {
     "test": "node --test",

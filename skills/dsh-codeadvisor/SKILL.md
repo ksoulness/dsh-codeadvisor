@@ -1,9 +1,9 @@
 ---
-name: codex-advisor
+name: dsh-codeadvisor
 description: 仅在本机 DSH 被用户明确点名「调用 codex」时使用：调本机 Codex CLI 的指定模型开新对话，只做计划与审核，绝不落地改动；所有执行仍由 DSH 完成。未点名时不要主动调用。
 metadata:
   scope: local-dsh
-  kit: <repo>
+  kit: https://github.com/ksoulness/dsh-codeadvisor
 ---
 
 # Codex 只读顾问

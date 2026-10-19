@@ -392,7 +392,7 @@ test('MCP 包装能完成握手并列出三个工具', async () => {  const chil
   const init = messages.find((m) => m.id === 1)
   const list = messages.find((m) => m.id === 2)
 
-  assert.equal(init.result.serverInfo.name, 'codex-advisor')
+  assert.equal(init.result.serverInfo.name, 'dsh-codeadvisor')
   const names = list.result.tools.map((t) => t.name)
   assert.deepEqual(names, ['codex_plan', 'codex_review', 'codex_ask'])
 })
@@ -474,10 +474,10 @@ test('CLI --version 跟随 package.json，无子命令也能命中', async () =>
   })
 
   const version = await run(['--version'])
-  assert.equal(version.out.trim(), `codex-advisor ${pkg.version}`)
+  assert.equal(version.out.trim(), `dsh-codeadvisor ${pkg.version}`)
 
   const help = await run(['--help'])
-  assert.match(help.out, /codex-advisor — DSH 主执行/)
+  assert.match(help.out, /dsh-codeadvisor — DSH 主执行/)
 })
 
 test('参数值以 -- 开头不会被当成标志吞掉', async () => {

@@ -9,11 +9,19 @@
  *   command: node
  *   args: ["<本仓库绝对路径>/mcp/server.mjs"]
  */
+import fs from 'node:fs'
 import { createInterface } from 'node:readline'
 import process from 'node:process'
 import { runAdvisor } from '../src/advisor.mjs'
 
-const SERVER_INFO = { name: 'codex-advisor', version: '0.1.0' }
+const PKG = (() => {
+  try {
+    return JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
+  } catch {
+    return { name: 'dsh-codeadvisor', version: '0.0.0' }
+  }
+})()
+const SERVER_INFO = { name: PKG.name || 'dsh-codeadvisor', version: PKG.version || '0.0.0' }
 const PROTOCOL_VERSION = '2024-11-05'
 
 const TOOLS = [
