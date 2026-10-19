@@ -73,7 +73,7 @@ node --test
 
 零运行时依赖，不需要 `npm install`。
 
-> 本包**不发布到 npm**（`package.json` 保留 `"private": true` 以防误发布）；分发走 GitHub 仓库和 Release 里的 `dsh-codeadvisor-0.1.3.tgz`。要改成可发布，删掉 `private` 字段再 `npm publish` 即可。
+> 本包**不发布到 npm**（`package.json` 保留 `"private": true` 以防误发布）；分发走 GitHub 仓库和 Release 里的 `dsh-codeadvisor-0.1.4.tgz`。要改成可发布，删掉 `private` 字段再 `npm publish` 即可。
 
 把**技能**装上（DSH 新会话生效）。这一步只是给 DSH 加一个技能目录，不涉及插件安装、不改 profile、不需重启宿主：
 
@@ -121,7 +121,7 @@ node src\advisor.mjs sessions
 | `--per-file-chars <n>` | 单文件字符预算，默认 20000 |
 | `--conversation <名字>` | 同一话题的多轮延续（本地台账回放最近 `--history` 轮，默认 3） |
 | `--timeout <秒>` | 默认 900，超时后终止进程树并在宽限期内收口 |
-| `--ledger <目录>` | 台账目录，默认 `%LOCALAPPDATA%\codex-advisor` |
+| `--ledger <目录>` | 台账目录，默认 `%LOCALAPPDATA%\dsh-codeadvisor` |
 | `--out <文件>` | 正文另存一份 |
 | `--no-open-in-codex` | 成功后不请求 Codex 桌面端打开该会话 |
 
@@ -207,7 +207,7 @@ codex exec -s read-only ...  →  CreateProcessAsUserW failed: 5 / 拒绝访问
 - **提示词双重声明**：即使沙箱被绕过，角色契约也写明「不许改文件、不许改变状态」。
 - **模型名白名单**：只接受 `[A-Za-z0-9._:-]`。
 - **台账不出本机**：正文与记录都落在本机目录，不上传、不发外部消息。
-- **台账只增不减**：`sessions.jsonl` 每轮追加一行、`texts/` 每轮存一份正文，约 0.8 KB/次（1 万次量级约 8 MB）。没有自动轮转——需要清理时直接删 `%LOCALAPPDATA%\codex-advisor` 下的旧 `texts/*.md` 或改用 `--ledger <新目录>`，不影响 Codex 侧任何数据。
+- **台账只增不减**：`sessions.jsonl` 每轮追加一行、`texts/` 每轮存一份正文，约 0.8 KB/次（1 万次量级约 8 MB）。没有自动轮转——需要清理时直接删 `%LOCALAPPDATA%\dsh-codeadvisor` 下的旧 `texts/*.md` 或改用 `--ledger <新目录>`，不影响 Codex 侧任何数据。
 - **上下文会发给模型提供商**：注入的内容会随提示词发给所选模型；涉密文件不要 `--context`。
 - 本包不是 OpenAI / DeepSeek 官方产品。
 

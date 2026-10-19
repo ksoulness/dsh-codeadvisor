@@ -1,6 +1,6 @@
 {
   "name": "dsh-codeadvisor",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "description": "DSH 主执行 + Codex 只读顾问：让 DSH 调 Codex 出计划与审核，执行仍归 DSH",
   "type": "module",

@@ -3,7 +3,8 @@ name: dsh-codeadvisor
 description: 仅在本机 DSH 被用户明确点名「调用 codex」时使用：调本机 Codex CLI 的指定模型开新对话，只做计划与审核，绝不落地改动；所有执行仍由 DSH 完成。未点名时不要主动调用。
 metadata:
   scope: local-dsh
-  kit: https://github.com/ksoulness/dsh-codeadvisor
+  repo: https://github.com/ksoulness/dsh-codeadvisor
+  installed: $DSH_HOME\agents-home\skills\dsh-codeadvisor
 ---
 
 # Codex 只读顾问
@@ -38,8 +39,10 @@ metadata:
 
 ## 一条命令
 
+> 下面用的是**已安装**的路径（技能目录自带 CLI，自包含）。如果你在 git 仓库里开发，把该路径换成 `<repo>\src\advisor.mjs`。
+
 ```powershell
-node <repo>\src\advisor.mjs <plan|review|ask> --workspace <项目根> --model <terra|sol|6.1sol|luna> --paths "<文件或目录>" --task "<任务>"
+node "$env:DSH_HOME\agents-home\skills\dsh-codeadvisor\src\advisor.mjs" <plan|review|ask> --workspace <项目根> --model <terra|sol|6.1sol|luna> --paths "<文件或目录>" --task "<任务>"
 ```
 
 `--paths` 指向的文件/目录会由 DSH 读进上下文（默认单文件 2 万字符、总量 8 万字符上限）。
@@ -49,7 +52,7 @@ node <repo>\src\advisor.mjs <plan|review|ask> --workspace <项目根> --model <t
 
 ```powershell
 # 审核当前 git 未提交改动（不需要写提示词）
-node <repo>\src\advisor.mjs review --diff --workspace <项目根> --model terra
+node "$env:DSH_HOME\agents-home\skills\dsh-codeadvisor\src\advisor.mjs" review --diff --workspace <项目根> --model terra
 
 # 多轮：同名 --conversation 会回放上一轮正文
 node ... plan  --workspace <根> --conversation my-design --task "第一轮：出方案"

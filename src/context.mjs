@@ -9,7 +9,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-const SKIP_DIRS = new Set(['.git', 'node_modules', '.codex-advisor', 'dist', 'build', '.venv', '__pycache__'])
+const SKIP_DIRS = new Set(['.git', 'node_modules', '.dsh-codeadvisor', 'dist', 'build', '.venv', '__pycache__'])
 
 function realPath(target) {
   try {

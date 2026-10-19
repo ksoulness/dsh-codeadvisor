@@ -458,7 +458,7 @@ const USAGE = `dsh-codeadvisor — DSH 主执行，Codex 只读顾问
   --out <文件>            把正文另存一份
   --no-open-in-codex      成功后不请求桌面端打开该会话
   --dry-run               只打印将要执行的命令，不真的调用 Codex
-  --ledger <目录>         台账目录，默认 %LOCALAPPDATA%\\codex-advisor
+  --ledger <目录>         台账目录，默认 %LOCALAPPDATA%\\\\dsh-codeadvisor
 
 环境变量：
   CODEX_ADVISOR_HOME             台账目录（覆盖 --ledger 之外的默认值）

@@ -13,9 +13,9 @@ export function resolveHome(flag) {
   if (flag) return path.resolve(flag)
   if (process.env.CODEX_ADVISOR_HOME) return path.resolve(process.env.CODEX_ADVISOR_HOME)
   if (process.platform === 'win32' && process.env.LOCALAPPDATA) {
-    return path.join(process.env.LOCALAPPDATA, 'codex-advisor')
+    return path.join(process.env.LOCALAPPDATA, 'dsh-codeadvisor')
   }
-  return path.join(os.homedir(), '.codex-advisor')
+  return path.join(os.homedir(), '.dsh-codeadvisor')
 }
 
 export function storePaths(home) {
