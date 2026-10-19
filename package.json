@@ -5,6 +5,28 @@
   "description": "DSH 主执行 + Codex 只读顾问：让 DSH 调 Codex 出计划与审核，执行仍归 DSH",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ksoulness/codex-advisor-kit.git"
+  },
+  "homepage": "https://github.com/ksoulness/codex-advisor-kit#readme",
+  "bugs": {
+    "url": "https://github.com/ksoulness/codex-advisor-kit/issues"
+  },
+  "keywords": [
+    "dsh",
+    "codex",
+    "advisor",
+    "second-opinion",
+    "code-review",
+    "plan"
+  ],
+  "files": [
+    "src",
+    "mcp",
+    "skills",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=22.19"
   },

@@ -2,14 +2,13 @@
 name: codex-advisor
 description: 仅在本机 DSH 被用户明确点名「调用 codex」时使用：调本机 Codex CLI 的指定模型开新对话，只做计划与审核，绝不落地改动；所有执行仍由 DSH 完成。未点名时不要主动调用。
 metadata:
-  scope: personal-local-dsh
-  host: DESKTOP-JCAJDQ3
-  kit: E:\Code\codex-advisor-kit
+  scope: local-dsh
+  kit: <repo>
 ---
 
 # Codex 只读顾问
 
-本技能只适用于本机（Windows `DESKTOP-JCAJDQ3`）个人 DSH。它把「另一个模型怎么看」接进来，而**不把执行权交出去**：Codex 在只读沙箱里出计划和审核意见，DSH 负责一切实际改动与验证。
+本技能只适用于本机（Windows `本机`）个人 DSH。它把「另一个模型怎么看」接进来，而**不把执行权交出去**：Codex 在只读沙箱里出计划和审核意见，DSH 负责一切实际改动与验证。
 
 ## 触发方式：只有用户点名才用
 
@@ -40,7 +39,7 @@ metadata:
 ## 一条命令
 
 ```powershell
-node E:\Code\codex-advisor-kit\src\advisor.mjs <plan|review|ask> --workspace <项目根> --model <terra|sol|6.1sol|luna> --paths "<文件或目录>" --task "<任务>"
+node <repo>\src\advisor.mjs <plan|review|ask> --workspace <项目根> --model <terra|sol|6.1sol|luna> --paths "<文件或目录>" --task "<任务>"
 ```
 
 `--paths` 指向的文件/目录会由 DSH 读进上下文（默认单文件 2 万字符、总量 8 万字符上限）。
@@ -50,7 +49,7 @@ node E:\Code\codex-advisor-kit\src\advisor.mjs <plan|review|ask> --workspace <�
 
 ```powershell
 # 审核当前 git 未提交改动（不需要写提示词）
-node E:\Code\codex-advisor-kit\src\advisor.mjs review --diff --workspace <项目根> --model terra
+node <repo>\src\advisor.mjs review --diff --workspace <项目根> --model terra
 
 # 多轮：同名 --conversation 会回放上一轮正文
 node ... plan  --workspace <根> --conversation my-design --task "第一轮：出方案"

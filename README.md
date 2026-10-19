@@ -21,7 +21,7 @@
 ```text
 用户 ❯ 让 Codex 审一下你刚才改的 advisor.mjs
 
-DSH  ❯ node src/advisor.mjs review --workspace E:\Code\codex-advisor-kit --model terra \
+DSH  ❯ node src/advisor.mjs review --workspace <本仓库> --model terra \
          --paths src/advisor.mjs --task "审核只读约束与超时处理，给出阻塞问题"
        → { ok: true, model: "gpt-5.6-terra", threadId: "01a1…", elapsedMs: 41233,
            usage: { inputTokens: 75525, outputTokens: 1834 }, textFile: "…\\adv_x.md" }
@@ -45,8 +45,8 @@ DSH  ❯ 自己动手改、自己跑测试、自己验证
 前置：Node.js ≥ 22.19、本机已登录的 `codex` CLI，支持 `app-server` 与 `historyMode: paginated`（本机桌面运行时 0.163.0-alpha.10.2 已验证；npm CLI 0.147.0 缺少项目协议，不可用于本目标）。
 
 ```powershell
-git clone <本仓库> E:\Code\codex-advisor-kit
-cd E:\Code\codex-advisor-kit
+git clone https://github.com/ksoulness/codex-advisor-kit.git
+cd codex-advisor-kit
 node --test
 ```
 
@@ -55,7 +55,7 @@ node --test
 把技能装上（DSH 新会话生效）：
 
 ```powershell
-Copy-Item -Recurse -Force E:\Code\codex-advisor-kit\skills\codex-advisor `
+Copy-Item -Recurse -Force .\skills\codex-advisor `
   "$env:DSH_HOME\agents-home\skills\codex-advisor"
 ```
 
@@ -187,15 +187,14 @@ codex exec -s read-only ...  →  CreateProcessAsUserW failed: 5 / 拒绝访问
 
 在制作机（Windows、Node `v24.19.0`、桌面 Codex CLI `0.163.0-alpha.10.2`（npm CLI 为 `0.147.0`）、DSH `0.2.1-alpha.2`）实测：
 
-- ✅ 修正项目归属后的真实问询：默认 `gpt-5.6-terra`，约 8.9 秒，返回 `DSH_PROJECT_OK`，输入 24,760 / 输出 8 token，独立进程退出已确认。
-- ✅ 新会话 `source=vscode`、`historyMode=paginated`、`cwd=E:\Code\DSH`，原生 `projectId=01a0b19b-880a-7c22-829a-42ea77a54f9d`；按项目 ID + cwd + 默认来源的列表读回通过。该 ID 仅为实测证据，程序每次动态匹配，不硬编码。
-- ✅ 自动侧栏端到端验收：新线程 `01a153c4-4d64-70b1-8eca-ca3bb8ac620a` 返回 `DSH_AUTO_SIDEBAR_OK` 后，`desktop.requested=true`；Codex 可访问性树直接读到它位于 `DSH` 项目列表。耗时 8.7 秒，输入 24,766 / 输出 12 token。
-- ✅ 回归测试 23 项：22 通过，1 项因本机无文件符号链接创建权限跳过。覆盖只读和模型回读、桌面原生协议请求、RPC 错误、提前退出、部分正文后失败、超时、列表缺失、多轮、上下文、三种 Git target、MCP 握手、旧运行时拒绝、项目分页、项目缺失和歧义、错误归属拒绝。
-- Git 审核的 RPC 路由已用协议替身覆盖；本次未额外发起真实 Git 模型审核。历史 exec 版本的 plan/review 实测不作为新传输的端到端证明。
-- ✅ 侧栏目标已完成：服务端项目归属确认后请求桌面原生协议，实际新验收会话已在 DSH 项目侧栏读回。该验证基于本机桌面运行时 `0.163.0-alpha.10.2`；其他版本仍会如实返回 `desktop` 请求结果。
+- ✅ 真实问询：默认 `gpt-5.6-terra`，约 9 秒返回预期短句，输入约 2.5 万 token；独占 app-server 子进程退出已确认。
+- ✅ 新会话落态：`source=vscode`、`historyMode=paginated`，并带原生 `projectId`；按项目 ID + cwd + 默认来源过滤的 `thread/list` 读回通过。
+- ✅ 自动侧栏端到端：新线程完成后 `desktop.requested=true`，桌面端可访问性树确认该会话位于对应项目下。
+- ✅ 回归测试 23 项：本机全部通过（含无符号链接权限时自动跳过的那 1 项）。覆盖只读与模型回读、桌面原生协议请求、RPC 错误、提前退出、部分正文后失败、超时、列表缺失、多轮、上下文、三种 Git target、MCP 握手、旧运行时拒绝、项目分页、项目缺失与歧义、错误归属拒绝。
+- Git 审核的 RPC 路由由协议替身覆盖；未在真实模型上跑过完整 Git 审核。
 - `--workspace` 必须是目标项目根；不会自动在桌面新增项目。
-- 本机上下文注入仍有预算和 realpath 边界；`--conversation` 是正文回放，每轮仍创建新 Codex 线程。
-- 模型额度不足或满载如实报错，不能静默换模型；耗时和 token 随模型、技能及上下文变化。
+- `--conversation` 是正文回放，每轮仍创建新 Codex 线程。
+- 模型额度不足或满载如实报错，不静默换模型；耗时和 token 随模型、技能及上下文变化。
 - 未验证：MCP 在 DSH 的真实挂载、其他 Codex 版本及非 Windows 平台。
 
 ## 目录结构
@@ -209,14 +208,14 @@ src/context.mjs       上下文注入（realpath 边界、预算、跳过原因�
 src/ledger.mjs        台账读写（sessions.jsonl + texts/）
 mcp/server.mjs        可选 stdio MCP 包装（codex_plan / codex_review / codex_ask）
 skills/codex-advisor/ 给 DSH 的技能：什么时候问、怎么问、怎么验收
-tests/                假 app-server 替身 + 22 项测试
-docs/                 本任务推进与验收记录
+tests/                假 app-server 替身 + 23 项测试
 ```
-
-## 文档
-
-- [方案与验收记录](docs/in-progress/) —— 调查结论、三修闭环、挂载前的待决定问题
 
 ## 许可
 
-MIT。
+MIT。本包不是 OpenAI / DeepSeek 官方产品。
+
+---
+
+[![](https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white)](https://github.com/deepseek-ai/deepseek-harness)
+
