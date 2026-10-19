@@ -106,6 +106,8 @@ node src\advisor.mjs sessions
 
 退出码：`0` 成功 / `2` 失败 / `3` 超时 / `4` 参数错误。
 
+任务内容三种来源：`--task "<文本>"`、`--task-file <文件>`、stdin（显式写 `--task -`，或直接 `echo "…" | node src/advisor.mjs ask`）。非交互环境下没给任务时最多等 1.5 秒就会以退出码 `4` 报错，不会挂死。
+
 ## 它怎么跑起来
 
 ```text
@@ -184,6 +186,7 @@ codex exec -s read-only ...  →  CreateProcessAsUserW failed: 5 / 拒绝访问
 - **提示词双重声明**：即使沙箱被绕过，角色契约也写明「不许改文件、不许改变状态」。
 - **模型名白名单**：只接受 `[A-Za-z0-9._:-]`。
 - **台账不出本机**：正文与记录都落在本机目录，不上传、不发外部消息。
+- **台账只增不减**：`sessions.jsonl` 每轮追加一行、`texts/` 每轮存一份正文，约 0.8 KB/次（1 万次量级约 8 MB）。没有自动轮转——需要清理时直接删 `%LOCALAPPDATA%\codex-advisor` 下的旧 `texts/*.md` 或改用 `--ledger <新目录>`，不影响 Codex 侧任何数据。
 - **上下文会发给模型提供商**：注入的内容会随提示词发给所选模型；涉密文件不要 `--context`。
 - 本包不是 OpenAI / DeepSeek 官方产品。
 

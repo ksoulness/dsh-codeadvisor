@@ -479,3 +479,38 @@ test('CLI --version 跟随 package.json，无子命令也能命中', async () =>
   const help = await run(['--help'])
   assert.match(help.out, /codex-advisor — DSH 主执行/)
 })
+
+test('参数值以 -- 开头不会被当成标志吞掉', async () => {
+  const child = spawn(process.execPath, [
+    path.join(ROOT, 'src', 'advisor.mjs'), 'ask',
+    '--workspace', ROOT,
+    '--task', '--dry-run 是什么意思',
+    '--dry-run',
+  ], { stdio: ['ignore', 'pipe', 'pipe'] })
+  let out = ''
+  child.stdout.setEncoding('utf8')
+  child.stdout.on('data', (d) => { out += d })
+  const code = await new Promise((resolve) => child.on('close', resolve))
+
+  assert.equal(code, 0, out)
+  const result = JSON.parse(out)
+  assert.equal(result.ok, true)
+  assert.equal(result.dryRun, true)
+  assert.match(result.prompt, /--dry-run 是什么意思/)
+})
+
+test('非交互环境下没给任务会快速失败，不会挂死', async () => {
+  const started = Date.now()
+  const child = spawn(process.execPath, [
+    path.join(ROOT, 'src', 'advisor.mjs'), 'ask', '--workspace', ROOT,
+  ], { stdio: ['pipe', 'pipe', 'pipe'] }) // stdin 一直开着且不写，模拟计划任务
+  let err = ''
+  child.stderr.setEncoding('utf8')
+  child.stderr.on('data', (d) => { err += d })
+  const code = await new Promise((resolve) => child.on('close', resolve))
+  const elapsed = Date.now() - started
+
+  assert.equal(code, 4, `期望参数错误退出码 4，实际 ${code}：${err}`)
+  assert.match(err, /缺少任务内容/)
+  assert.ok(elapsed < 8000, `1.5 秒上限失效，实际等了 ${elapsed}ms`)
+})

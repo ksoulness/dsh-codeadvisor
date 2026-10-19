@@ -1,6 +1,6 @@
 {
   "name": "codex-advisor-kit",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "DSH 主执行 + Codex 只读顾问：让 DSH 调 Codex 出计划与审核，执行仍归 DSH",
   "type": "module",

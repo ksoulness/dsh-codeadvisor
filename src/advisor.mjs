@@ -452,6 +452,7 @@ const USAGE = `codex-advisor — DSH 主执行，Codex 只读顾问
   --conversation <名字>   同一话题的多轮延续（本地台账回放）
   --history <n>           回放最近 n 轮，默认 3
   --task-file <文件>      从文件读任务
+  --task -                从 stdin 读任务（非 TTY 未给任务时最多等 1.5 秒，不会挂死）
   --text                  只打印正文，不打印 JSON
   --timeout <秒>          默认 900，0 表示不限
   --out <文件>            把正文另存一份
@@ -466,6 +467,13 @@ const USAGE = `codex-advisor — DSH 主执行，Codex 只读顾问
 
 退出码：0 成功 / 2 失败 / 3 超时 / 4 参数错误
 `
+
+/** 必须有值的键：即使下一个 token 长得像标志，也当作它的值（例如 `--task "--dry-run 是什么"`）。 */
+const VALUE_FLAGS = new Set([
+  'workspace', 'model', 'effort', 'paths', 'context', 'context-budget', 'per-file-chars',
+  'conversation', 'history', 'history-chars', 'task', 'task-file', 'timeout', 'out',
+  'ledger', 'base', 'commit',
+])
 
 function parseArgv(argv) {
   const out = { _: [] }
@@ -483,11 +491,12 @@ function parseArgv(argv) {
       }
       const key = arg.slice(2)
       const next = argv[i + 1]
-      if (next === undefined || next.startsWith('--')) {
-        out[key] = true
-      } else {
+      const takesValue = VALUE_FLAGS.has(key) ? next !== undefined : (next !== undefined && !next.startsWith('--'))
+      if (takesValue) {
         out[key] = next
         i += 1
+      } else {
+        out[key] = true
       }
       continue
     }
@@ -496,17 +505,38 @@ function parseArgv(argv) {
   return out
 }
 
-function readTask(args) {
+/** 读 stdin，最多等 ms 毫秒（ms<=0 表示等到 EOF）。避免非交互环境里永久挂住。 */
+function readStdin(ms) {
+  return new Promise((resolve) => {
+    let data = ''
+    let settled = false
+    const finish = (value) => {
+      if (settled) return
+      settled = true
+      if (timer) clearTimeout(timer)
+      process.stdin.removeAllListeners('data')
+      process.stdin.removeAllListeners('end')
+      process.stdin.removeAllListeners('error')
+      process.stdin.pause()
+      resolve(value)
+    }
+    const timer = ms > 0 ? setTimeout(() => finish(data), ms) : null
+    process.stdin.setEncoding('utf8')
+    process.stdin.on('data', (chunk) => { data += chunk })
+    process.stdin.on('end', () => finish(data))
+    process.stdin.on('error', () => finish(data))
+    process.stdin.resume()
+  })
+}
+
+async function readTask(args) {
   if (typeof args.task === 'string' && args.task !== '-') return args.task
   if (args['task-file']) return fs.readFileSync(path.resolve(String(args['task-file'])), 'utf8')
-  if (args.task === '-' || !process.stdin.isTTY) {
-    try {
-      return fs.readFileSync(0, 'utf8')
-    } catch {
-      return ''
-    }
-  }
-  return ''
+  // `--task -` 是显式要求读 stdin，等到 EOF；其余情况只要不连 TTY 就尝试读，
+  // 但设 1.5 秒上限——计划任务里忘写任务时不会静默挂死，管道有内容时照样能读到。
+  if (args.task === '-') return readStdin(0)
+  if (process.stdin.isTTY) return ''
+  return readStdin(1500)
 }
 
 function sessionsCommand(args) {
@@ -568,7 +598,7 @@ async function main(argv) {
     return 4
   }
 
-  const task = readTask(args)
+  const task = await readTask(args)
   if (!task.trim() && !(command === 'review' && args.diff)) {
     process.stderr.write('缺少任务内容：用 --task / --task-file，或从 stdin 传入\n')
     return 4
