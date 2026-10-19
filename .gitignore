@@ -3,3 +3,4 @@ node_modules/
 .local/
 /PROJECT.md
 /docs/
+*.tgz
